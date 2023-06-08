@@ -1,42 +1,28 @@
-console.log('Express Tutorial');
+const express = require('express');
+const app = express();
+const path = require('path');
 
-const { readFileSync } = require('fs');
-const http = require('http');
+//move resources of the navbar app into a new public folder
+app.use(express.static('./public'));
 
-const homePage = readFileSync('./navbar-app/index.html');
-const css = readFileSync('./navbar-app/styles.css');
-const logo = readFileSync('./navbar-app/logo.svg');
-const js = readFileSync('./navbar-app/browser-app.js');
-
-const server = http.createServer((req, res) => {
-  const url = req.url;
-  console.log(url);
-
-  if (url === '/') {
-    res.writeHead(200, { 'content-type': 'text/html' });
-    res.write(homePage);
-    res.end();
-  } else if (url === '/styles.css') {
-    res.writeHead(200, { 'content-type': 'text/css' });
-    res.write(css);
-    res.end();
-  } else if (url === '/logo.svg') {
-    res.writeHead(200, { 'content-type': 'image/svg+xml' });
-    res.write(logo);
-    res.end();
-  } else if (url === '/browser-app.js') {
-    res.writeHead(200, { 'content-type': 'text/html' });
-    res.write(js);
-    res.end();
-  } else if (url === '/about') {
-    res.writeHead(200, { 'content-type': 'text/html' });
-    res.write('<h1>about</h1>');
-    res.end();
-  } else {
-    res.writeHead(403, { 'content-type': 'text/html' });
-    res.write('<h1>Error</h1>');
-    res.end();
-  }
+app.get('/', (req, res) => {
+  /**
+     * to get back a webpage we'll use the following:
+     * use path to get the path of the files of our website by using --> resolve()
+     * then we'll pass the pathfile by:
+     *           resolving the path with path.resolve()
+     *                  node global object __dirname to get our server's directory
+                        and now within the server, pointing to the root of our websites (index.html)
+     * One last thing is that we use sendFile() method not send
+     * FYI could use path.join() with the same reoslving of the path (params)
+     */
+  res.sendFile(path.resolve(__dirname, './navbar-app/index.html'));
 });
 
-server.listen(5000);
+app.all('*', (req, res) => {
+  res.status(404).send('Resource not found');
+});
+
+app.listen(5000, () => {
+  console.log('server listening');
+});
