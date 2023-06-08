@@ -1,0 +1,23 @@
+{
+  "name": "node_tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "main": "01-intro.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "scriptsComments": {
+    "dev": "will use nodemon to set up terminal env to continuously test code updated in VSC. note the use of full command - npm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "dependenciesComments": {
+    "nodemon": "nodemon is used to keep your server running in the terminal. devDependencies are development lifecycle only dependencies not pushed to production env"
+  }
+}
