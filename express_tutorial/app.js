@@ -1,29 +1,55 @@
 const express = require('express');
 const app = express();
-const path = require('path');
-
-//move resources of the navbar app into a new public folder
-//static is a set of files that are not changing/dynamic
-app.use(express.static('./public'));
+const { products } = require('./data');
 
 app.get('/', (req, res) => {
-  /**
-   * to get back a webpage we'll use the following:
-   * use path to get the path of the files of our website by using --> resolve()
-   * then we'll pass the pathfile by:
-   *         - resolving the path with path.resolve()
-   *                  - node global object __dirname to get our server's directory
-   *                  - and now within the server, pointing to the root of our websites (index.html)
-   * One last thing is that we use sendFile() method not send
-   * FYI could use path.join() with the same reoslving of the path (params)
-   */
-  res.sendFile(path.resolve(__dirname, './navbar-app/index.html'));
+  res.send('<h1>Home Page</h1><a href="/api/products">products</a>');
 });
 
-app.all('*', (req, res) => {
-  res.status(404).send('Resource not found');
+app.get('/api/products/', (req, res) => {
+  const newProducts = products.map((prod) => {
+    const { id, name, image } = prod;
+    return { id, name, image };
+  });
+  res.json(newProducts);
+});
+
+app.get('/api/products/:productId', (req, res) => {
+  const singleProduct = products.find(
+    (product) => product.id === Number(req.params.productId)
+  );
+  if (!singleProduct) return res.status(404).send('Product does not exist');
+  const product = ({ id, name, image } = singleProduct);
+  return res.json(product);
+});
+
+app.get('/api/v1/query', (req, res) => {
+  const { search, limit } = req.query;
+  let sortedProducts = [...products];
+  if (search) {
+    const prods = [];
+    sortedProducts.map((prod) => {
+      if (prod.name.startsWith(search)) prods.push(prod);
+    });
+    sortedProducts = prods;
+  }
+
+  if (limit) sortedProducts = sortedProducts.slice(0, Number(limit));
+
+  if (sortedProducts.length === 0)
+    return res.status(200).send('no products matched your search');
+
+  if (sortedProducts.length === products.length) {
+    const newProducts = products.map((prod) => {
+      const { id, name, image } = prod;
+      return { id, name, image };
+    });
+    return res.status(200).json(newProducts);
+  }
+
+  return res.status(200).json(sortedProducts);
 });
 
 app.listen(5000, () => {
-  console.log('server listening');
+  console.log('Server is listening on 5000');
 });
