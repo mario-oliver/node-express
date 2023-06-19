@@ -1,9 +1,11 @@
 const app = require('express')();
 const logger = require('./logger');
+const authorize = require('./authorize');
 
 //order does matter - root method will not utilize our logger middleware function, but the ones below will
 //can supply a url extension to tell the use() function what urls to attach the middleware to
-app.use('/api', logger);
+//the list of middleware is executed in order
+app.use([logger, authorize]);
 
 app.get('/', (req, res) => {
   res.send('Home');
@@ -14,6 +16,7 @@ app.get('/about', (req, res) => {
 });
 
 app.get('/api/products', (req, res) => {
+  console.log(req.user);
   res.send('Home');
 });
 
