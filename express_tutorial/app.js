@@ -1,11 +1,13 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
+let { people } = require('./data');
+const path = require('path');
 
-app.get('/', (req, res) => {
-  res.send('Home');
-});
+// static
+app.use(express.static('./methods-public'));
 
-app.get('/about', (req, res) => {
-  res.send('About');
+app.get('/api/people', (req, res) => {
+  res.status(200).json({ success: true, people: people });
 });
 
 app.listen(5000, () => {
