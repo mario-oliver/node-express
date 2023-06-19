@@ -1,55 +1,25 @@
-const express = require('express');
-const app = express();
-const { products } = require('./data');
+const app = require('express')();
 
-app.get('/', (req, res) => {
-  res.send('<h1>Home Page</h1><a href="/api/products">products</a>');
+//we use the req function but don't pass it into the function
+//express automatically supplies the req and res objects to middlewre
+const logger = (req, res, next) => {
+  const method = req.method;
+  const url = req.url;
+  const time = new Date().getTime();
+  console.log(method, url, time);
+  next();
+  // or --> res.send("Done");
+  //when you work with middleware, you must pass the execution to the next middleware function (unless you are passing the result to the response object)
+};
+
+app.get('/', logger, (req, res) => {
+  res.send('Home');
 });
 
-app.get('/api/products/', (req, res) => {
-  const newProducts = products.map((prod) => {
-    const { id, name, image } = prod;
-    return { id, name, image };
-  });
-  res.json(newProducts);
-});
-
-app.get('/api/products/:productId', (req, res) => {
-  const singleProduct = products.find(
-    (product) => product.id === Number(req.params.productId)
-  );
-  if (!singleProduct) return res.status(404).send('Product does not exist');
-  const product = ({ id, name, image } = singleProduct);
-  return res.json(product);
-});
-
-app.get('/api/v1/query', (req, res) => {
-  const { search, limit } = req.query;
-  let sortedProducts = [...products];
-  if (search) {
-    const prods = [];
-    sortedProducts.map((prod) => {
-      if (prod.name.startsWith(search)) prods.push(prod);
-    });
-    sortedProducts = prods;
-  }
-
-  if (limit) sortedProducts = sortedProducts.slice(0, Number(limit));
-
-  if (sortedProducts.length === 0)
-    return res.status(200).send('no products matched your search');
-
-  if (sortedProducts.length === products.length) {
-    const newProducts = products.map((prod) => {
-      const { id, name, image } = prod;
-      return { id, name, image };
-    });
-    return res.status(200).json(newProducts);
-  }
-
-  return res.status(200).json(sortedProducts);
+app.get('/about', (req, res) => {
+  res.send('About');
 });
 
 app.listen(5000, () => {
-  console.log('Server is listening on 5000');
+  console.log('Server listening on 5000');
 });
